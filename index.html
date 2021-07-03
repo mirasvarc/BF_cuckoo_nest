@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <title>Hello World!</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+   
+    <div id="header-text">
+        <h1 class="text-center h1-text">TEST</h1>
+        <h1 class="text-center h1-input hidden"><input type="text" value=""></h1>
+    </div>
+
+    <div id="countdown">
+        <span>75:00</span>
+        <input value="75:00" placeholder="00:00">
+    </div>
+
+    <script src="./countdown.js"></script>
+  </body>
+</html>

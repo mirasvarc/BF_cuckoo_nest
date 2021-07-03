@@ -1,0 +1,19 @@
+{
+  "name": "kuku",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "author": "Miroslav Švarc",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^13.1.5"
+  },
+  "dependencies": {
+    "bootstrap": "^5.0.2",
+    "jquery": "^3.6.0"
+  }
+}

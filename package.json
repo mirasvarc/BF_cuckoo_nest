@@ -1,19 +1,56 @@
 {
-  "name": "kuku",
+  "name": "cuckoos_nest",
   "version": "1.0.0",
-  "description": "",
+  "description": "Admin for exit game Cuckoo's nest from BrainFAQ",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron ."
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "author": "Miroslav Švarc",
   "license": "MIT",
   "devDependencies": {
+    "@electron-forge/cli": "^6.0.0-beta.57",
+    "@electron-forge/maker-deb": "^6.0.0-beta.57",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.57",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.57",
+    "@electron-forge/maker-zip": "^6.0.0-beta.57",
     "electron": "^13.1.5"
   },
   "dependencies": {
     "bootstrap": "^5.0.2",
+    "electron-squirrel-startup": "^1.0.0",
     "jquery": "^3.6.0"
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {
+        "icon": "img/kuku.ico"
+      },
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "kuku"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ]
+    }
   }
 }

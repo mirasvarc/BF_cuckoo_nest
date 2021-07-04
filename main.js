@@ -1,6 +1,7 @@
 const { app, BrowserWindow, screen, ipcMain } = require('electron')
 const path = require('path')
 
+if (require('electron-squirrel-startup')) return app.quit();
 
 app.whenReady().then(() => {
     createWindow()
@@ -57,7 +58,7 @@ function createWindow () {
 
     win.loadFile('index.html')
 
-    win.webContents.openDevTools()
+    //win.webContents.openDevTools()
 
     win.on('closed', function () {
       app.quit()

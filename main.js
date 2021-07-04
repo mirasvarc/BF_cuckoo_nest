@@ -28,7 +28,8 @@ function createWindow () {
       const win2 = new BrowserWindow({
         x: externalDisplay.bounds.x + 50,
         y: externalDisplay.bounds.y + 50,
-        fullscreenable: true,
+        fullscreen: true,
+        frame: false,
         webPreferences: {
           nodeIntegration: true,
           contextIsolation: false,
@@ -40,7 +41,7 @@ function createWindow () {
         win2.webContents.send('action-update-label', arg);
       });  
 
-      win2.webContents.openDevTools()
+      //win2.webContents.openDevTools()
     } 
 
     const win = new BrowserWindow({
@@ -56,7 +57,7 @@ function createWindow () {
 
     win.loadFile('index.html')
 
-    //win.webContents.openDevTools()
+    win.webContents.openDevTools()
 
     win.on('closed', function () {
       app.quit()

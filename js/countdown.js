@@ -23,6 +23,9 @@ function startTimer() {
 
     data.time = hours + ":" + minutes + ":" + seconds;
 
+    data.textSent = 0;
+    data.timeSent = 1;
+
     ipcRenderer.send('request-update-label-in-second-window', data);
     
     if (--timer < 0) {
@@ -86,6 +89,8 @@ $('#time-input input').on('focusout', function() {
 $('#start-btn').on('click', function() {
     time = $('#time').text();
 
+   // $('.debug').append('<br><span>Časomíra spuštěna</span>')
+
     hours = parseInt(time.split(":")[0]);
     minutes = parseInt(time.split(":")[1]);
     seconds = parseInt(time.split(":")[2]);
@@ -95,6 +100,8 @@ $('#start-btn').on('click', function() {
     timer = duration, hours, minutes, seconds;
 
     intervalId = setInterval(startTimer, 1000);
+
+
 });
 
 $('#stop-btn').on('click', function() {

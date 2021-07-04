@@ -37,6 +37,7 @@ h1 {
 .h1-text {
     padding: 16.5px 50px;
     font-weight: normal;
+    font-size: 4em;
 }
 
 #header-text {
@@ -93,4 +94,35 @@ h1 {
 
 #reset-btn:active {
     background-color: rgb(32, 32, 32);
+}
+
+#cuckoo-text {
+    font-weight: normal;
+}
+
+#cuckoo-time {
+    font-size: 10em;
+}
+
+.debug {
+    width: 300px;
+    min-height: 550px;
+    border: 1px solid rgb(134, 134, 134);
+    position: absolute;
+    top: 10px;
+}
+
+.debug span {
+    padding: 5px;
+}
+
+.kuku-logo {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+}
+
+.kuku-logo img {
+    width: 300px;
+
 }

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'">
+    <title>Hello World!</title>
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+  <body>
+   
+    <div id="header-text">
+        <h1 class="text-center" id="cuckoo-text">TEST</h1>
+    </div>
+
+    <div id="countdown">
+        <h1 id="cuckoo-time" class="text-center">01:15:00</h1>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        ipcRenderer.on('action-update-label', (event, arg) => {
+
+            let time = document.getElementById("cuckoo-time");
+            let text = document.getElementById("cuckoo-text");
+
+            if(arg.timeSent == 1 && arg.textSent == 0) {
+                time.innerHTML = arg.time;
+            } else if (arg.timeSent == 0 && arg.textSent == 1) {
+                text.innerHTML = arg.text;
+            }
+            
+           
+        });
+    </script>
+
+  </body>
+</html>

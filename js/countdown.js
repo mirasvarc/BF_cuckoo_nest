@@ -1,6 +1,13 @@
+const { ipcRenderer } = require('electron');
 let $ = jQuery = require('jquery');
 let time, duration;
 var timer;
+let data = {
+    time: "",
+    text: "",
+    timeSent: 0,
+    textSent: 0,
+}
 
 function startTimer() {
    
@@ -13,6 +20,10 @@ function startTimer() {
     seconds = seconds < 10 ? "0" + seconds : seconds;
 
     $('#time').text(hours + ":" + minutes + ":" + seconds);
+
+    data.time = hours + ":" + minutes + ":" + seconds;
+
+    ipcRenderer.send('request-update-label-in-second-window', data);
     
     if (--timer < 0) {
         timer = duration;
@@ -31,28 +42,43 @@ $('.h1-input input').on('focusout', function() {
     $('.h1-input').addClass('hidden');
     if($(this).val() != "") {
         $('.h1-text').text($(this).val());
+        data.text = $(this).val();
     } else {
         $('.h1-text').text("Zadej text...");
-    }    
+        data.text = "Zadej text...";
+    }   
+
+    data.textSent = 1;
+    data.timeSent = 0;
+
+    ipcRenderer.send('request-update-label-in-second-window', data);
 });
 
 
 $('#countdown').on('click', function(){
     $('#time').addClass('hidden');
     $('#time-input').removeClass('hidden');
-    $('#time-input').val($('#time').text());
-    $('#time-input').focus();
+    $('#time-input input').val($('#time').text());
+    $('#time-input input').focus();
 });
 
-$('#time-input').on('focusout', function() {
+$('#time-input input').on('focusout', function() {
     $('#time').removeClass('hidden');
     $('#time-input').addClass('hidden');
 
     if($(this).val() != "") {
         $('#time').text($(this).val());
+        data.time = $(this).val();
     } else {
-        $('#timet').text("00:00:00");
+        $('#time').text("01:15:00");
+        data.time = "01:15:00";
     }
+
+    data.textSent = 0;
+    data.timeSent = 1;
+
+
+    ipcRenderer.send('request-update-label-in-second-window', data);
 });
 
 
@@ -81,4 +107,11 @@ $('#reset-btn').on('click', function() {
       clearInterval(intervalId);
     
     $('#time').text('01:15:00');
+
+    data.time = '01:15:00';
+
+    data.textSent = 0;
+    data.timeSent = 1;
+
+    ipcRenderer.send('request-update-label-in-second-window', data);
 });

@@ -9,8 +9,12 @@ let data = {
     textSent: 0,
 }
 
+var timerRunning = true;
+var timerUp = false;
+
 function startTimer() {
    
+    
     hours = parseInt(timer / 60 / 60, 10);
     minutes = parseInt(timer / 60 % 60, 10);
     seconds = parseInt(timer % 60, 10);
@@ -19,7 +23,13 @@ function startTimer() {
     minutes = minutes < 10 ? "0" + minutes : minutes;
     seconds = seconds < 10 ? "0" + seconds : seconds;
 
-    $('#time').text(hours + ":" + minutes + ":" + seconds);
+    if(!timerUp) {
+        $('#time').text(hours + ":" + minutes + ":" + seconds);
+    } else {
+        $('#time').text("-" + hours + ":" + minutes + ":" + seconds);
+        $('#time').css('color', 'red');
+    }
+    
 
     data.time = hours + ":" + minutes + ":" + seconds;
 
@@ -27,9 +37,15 @@ function startTimer() {
     data.timeSent = 1;
 
     ipcRenderer.send('request-update-label-in-second-window', data);
-    
-    if (--timer < 0) {
-        timer = duration;
+        
+    if(!timerUp) {
+        if (--timer <= 0) {
+            timerUp = true;
+            //timer = duration;
+        }
+
+    } else {
+        timer++;
     }
 }
 
@@ -87,31 +103,43 @@ $('#time-input input').on('focusout', function() {
 
 
 $('#start-btn').on('click', function() {
-    time = $('#time').text();
+    
+    if(timerRunning) {
+        
+        timerRunning = false;
+        $(this).addClass('disabled');
 
-   // $('.debug').append('<br><span>Časomíra spuštěna</span>')
+        time = $('#time').text();
+        
+        hours = parseInt(time.split(":")[0]);
+        minutes = parseInt(time.split(":")[1]);
+        seconds = parseInt(time.split(":")[2]);
 
-    hours = parseInt(time.split(":")[0]);
-    minutes = parseInt(time.split(":")[1]);
-    seconds = parseInt(time.split(":")[2]);
+        duration = (hours * 60 * 60) + (minutes * 60) + seconds;
 
-    duration = (hours * 60 * 60) + (minutes * 60) + seconds;
+        timer = duration, hours, minutes, seconds;
 
-    timer = duration, hours, minutes, seconds;
-
-    intervalId = setInterval(startTimer, 1000);
-
+        intervalId = setInterval(startTimer, 1000);
+    }
 
 });
 
 $('#stop-btn').on('click', function() {
-    if (intervalId)
-      clearInterval(intervalId);
+    if (intervalId) {
+        timerRunning = true;
+        $('#start-btn').removeClass('disabled');
+        clearInterval(intervalId);
+    }
 });
 
 $('#reset-btn').on('click', function() {
-    if (intervalId)
-      clearInterval(intervalId);
+    if (intervalId) {
+        timerRunning = true;
+        timerUp = false;
+        $('#start-btn').removeClass('disabled');
+        $('#time').css('color', 'black');
+        clearInterval(intervalId);
+    }
     
     $('#time').text('01:15:00');
 
@@ -119,6 +147,15 @@ $('#reset-btn').on('click', function() {
 
     data.textSent = 0;
     data.timeSent = 1;
+
+    ipcRenderer.send('request-update-label-in-second-window', data);
+});
+
+$('.defined-texts-item').on('click', function() {
+    $('.h1-text').text($(this).html());
+    data.text = $(this).html();
+    data.textSent = 1;
+    data.timeSent = 0;
 
     ipcRenderer.send('request-update-label-in-second-window', data);
 });

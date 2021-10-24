@@ -49,6 +49,7 @@ h1 {
     margin-top: 50px;
 }
 
+
 #countdown-btns {
     display: flex;
     flex-direction: row;
@@ -61,9 +62,12 @@ h1 {
 #stop-btn, 
 #reset-btn {
     padding: 18px 40px;
-    border-radius: 10px;
+    border-radius: 5px;
     margin: 0px 15px;
     color: white;
+    -webkit-box-shadow: 5px 5px 8px -1px rgba(0,0,0,0.28);
+    -moz-box-shadow: 5px 5px 8px -1px rgba(0,0,0,0.28);
+    box-shadow: 5px 5px 8px -1px rgba(0,0,0,0.28);
 }
 
 #start-btn:hover, 
@@ -125,4 +129,28 @@ h1 {
 .kuku-logo img {
     width: 300px;
 
+}
+
+.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.defined-texts {
+    position: absolute;
+    bottom: 50px;
+    left: 50px;
+    padding: 5px 20px;
+    border: 1px solid black;
+}
+
+.defined-texts .title {
+    font-size: 18px;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.defined-texts-item:hover {
+    cursor: pointer;
+    transform: scale(1.01);
 }

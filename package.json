@@ -1,6 +1,6 @@
 {
   "name": "cuckoos_nest",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Admin for exit game Cuckoo's nest from BrainFAQ",
   "main": "main.js",
   "scripts": {
@@ -33,7 +33,9 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "kuku"
+            "name": "kuku",
+            "setupIcon": "img/kuku.ico",
+            "setupExe": "cuckoos_nest-v1.1-setup.exe"
           }
         },
         {

@@ -186,28 +186,12 @@ timeInput.addEventListener('focusout', () => {
   sendTimeUpdate(val);
 });
 
-// ── Reset: hold-to-confirm (1.5 s) ───────────────────────────
-let resetHoldTimer = null;
-
-resetBtn.addEventListener('mousedown', () => {
-  resetBtn.classList.add('holding');
-  resetHoldTimer = setTimeout(() => {
-    resetBtn.classList.remove('holding');
-    resetTimer();
-  }, 1500);
-});
-
-function cancelReset() {
-  clearTimeout(resetHoldTimer);
-  resetBtn.classList.remove('holding');
-}
-
-resetBtn.addEventListener('mouseup', cancelReset);
-resetBtn.addEventListener('mouseleave', cancelReset);
-
 // ── Control buttons ──────────────────────────────────────────
 startBtn.addEventListener('click', startTimer);
 stopBtn.addEventListener('click', pauseTimer);
+resetBtn.addEventListener('click', () => {
+  if (window.confirm('Reset the timer?')) resetTimer();
+});
 
 // ── Time presets ─────────────────────────────────────────────
 timePresetBtns.forEach((btn) => {
@@ -254,3 +238,6 @@ function applyLanguage(lang) {
 
 langCsBtn.addEventListener('click', () => applyLanguage('cs'));
 langEnBtn.addEventListener('click', () => applyLanguage('en'));
+
+// Apply default language on startup
+applyLanguage(currentLang);

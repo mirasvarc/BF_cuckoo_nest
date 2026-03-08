@@ -221,28 +221,8 @@ h1 {
 #stop-btn { background: var(--red); }
 #stop-btn:hover { background: var(--red-dark); }
 
-/* Reset: hold-to-confirm fill animation */
-#reset-btn {
-  background: var(--neutral);
-  position: relative;
-  overflow: hidden;
-}
-
+#reset-btn { background: var(--neutral); }
 #reset-btn:hover { background: var(--neutral-dark); }
-
-#reset-btn::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(255, 255, 255, 0.35);
-  width: 0%;
-  transition: none;
-}
-
-#reset-btn.holding::before {
-  width: 100%;
-  transition: width 1.5s linear;
-}
 
 /* ── Time presets ──────────────────────────────────────────── */
 #time-presets {

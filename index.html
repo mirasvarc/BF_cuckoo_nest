@@ -2,43 +2,57 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
-    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
-    <title>Cuckoo's nest v1.1</title>
+    <title>Cuckoo's Nest Admin</title>
     <link rel="stylesheet" href="css/style.css">
   </head>
   <body>
 
-    <!--<div class="debug">
-      <span>Start</span>
-    </div>-->
+    <div id="top-bar">
+      <div id="lang-switcher">
+        <button id="lang-cs" class="active">CZ</button>
+        <button id="lang-en">EN</button>
+      </div>
+      <span id="version"></span>
+    </div>
 
     <div class="kuku-logo">
       <img src="img/black_kukacci-hnizdo.svg">
     </div>
-   
+
     <div id="header-text">
-        <h1 class="text-center h1-text">Čas do lobotomie pacientů</h1>
-        <h1 class="text-center h1-input hidden"><input type="text" value=""></h1>
+      <h1 class="text-center h1-text">Čas do lobotomie pacientů</h1>
+      <h1 class="text-center h1-input hidden"><input type="text" value=""></h1>
+      <p class="edit-hint">Click to edit text</p>
     </div>
 
     <div id="countdown">
-        <h1 id="time" class="text-center">01:15:00</h1>
-        <h1 id="time-input" class="text-center hidden"><input value="01:15:00" placeholder="00:00:00"></h1>
+      <h1 id="time" class="text-center">01:15:00</h1>
+      <h1 id="time-input" class="text-center hidden"><input value="01:15:00" placeholder="00:00:00"></h1>
+      <p id="time-edit-hint" class="edit-hint">Click to set time</p>
     </div>
 
     <div id="countdown-btns" class="text-center">
-      <span id="start-btn">Start</span>
-      <span id="stop-btn">Pause</span>
-      <span id="reset-btn">Reset</span>
+      <button id="start-btn">Start</button>
+      <button id="stop-btn">Pause</button>
+      <button id="reset-btn">Reset</button>
+    </div>
+
+    <div id="time-presets">
+      <span class="preset-label" data-i18n="quickSet">Quick set:</span>
+      <button class="time-preset" data-time="00:30:00">30 min</button>
+      <button class="time-preset" data-time="00:45:00">45 min</button>
+      <button class="time-preset" data-time="01:00:00">60 min</button>
+      <button class="time-preset" data-time="01:15:00">75 min</button>
+      <button class="time-preset" data-time="01:30:00">90 min</button>
     </div>
 
     <div class="defined-texts">
-      <p class="title">Nastavit text na:</p>
-      <p class="defined-texts-item">Nouzový východ otevřen</p>
-      <p class="defined-texts-item">Čas do lobotomie pacientů</p>
-      <p class="defined-texts-item">Čas do příchodu lékaře</p>
+      <p class="title" data-i18n="setTextLabel">Nastavit text na:</p>
+      <p class="defined-texts-item" data-i18n-item="0">Nouzový východ otevřen</p>
+      <p class="defined-texts-item" data-i18n-item="1">Čas do lobotomie pacientů</p>
+      <p class="defined-texts-item" data-i18n-item="2">Čas do příchodu lékaře</p>
+      <p class="defined-texts-item" data-i18n-item="3">Zákrok odložen</p>
     </div>
 
     <script src="js/countdown.js"></script>

@@ -1,161 +1,256 @@
-const { ipcRenderer } = require('electron');
-let $ = jQuery = require('jquery');
-let time, duration;
-var timer;
-let data = {
-    time: "",
-    text: "",
-    timeSent: 0,
-    textSent: 0,
+// ── i18n ────────────────────────────────────────────────────
+const i18n = {
+  cs: {
+    headerDefault: 'Čas do lobotomie pacientů',
+    placeholder: 'Zadej text...',
+    setTextLabel: 'Nastavit text na:',
+    quickSet: 'Rychlé nastavení:',
+    pause: 'Pozastavit',
+    texts: [
+      'Nouzový východ otevřen',
+      'Čas do lobotomie pacientů',
+      'Čas do příchodu lékaře',
+      'Zákrok odložen',
+    ],
+  },
+  en: {
+    headerDefault: 'Time until patient lobotomy',
+    placeholder: 'Enter text...',
+    setTextLabel: 'Set text to:',
+    quickSet: 'Quick set:',
+    pause: 'Pause',
+    texts: [
+      'Emergency exit opened',
+      'Time until patient lobotomy',
+      'Time until doctor\'s arrival',
+      'Surgery postponed',
+    ],
+  },
+};
+
+let currentLang = 'cs';
+function t() { return i18n[currentLang]; }
+
+// ── DOM refs ─────────────────────────────────────────────────
+const DEFAULT_TIME = '01:15:00';
+
+const timeEl             = document.getElementById('time');
+const timeInputWrapper   = document.getElementById('time-input');
+const timeInput          = timeInputWrapper.querySelector('input');
+const headerTextEl       = document.querySelector('.h1-text');
+const headerInputWrapper = document.querySelector('.h1-input');
+const headerInput        = headerInputWrapper.querySelector('input');
+const startBtn           = document.getElementById('start-btn');
+const stopBtn            = document.getElementById('stop-btn');
+const resetBtn           = document.getElementById('reset-btn');
+const definedTextItems   = document.querySelectorAll('.defined-texts-item');
+const setTextLabel       = document.querySelector('.defined-texts .title');
+const quickSetLabel      = document.querySelector('.preset-label');
+const timePresetBtns     = document.querySelectorAll('.time-preset');
+const langCsBtn          = document.getElementById('lang-cs');
+const langEnBtn          = document.getElementById('lang-en');
+const versionEl          = document.getElementById('version');
+const timeEditHint       = document.getElementById('time-edit-hint');
+
+// ── State ────────────────────────────────────────────────────
+const state = {
+  totalSeconds: 0,
+  isRunning: false,
+  isOvertime: false,
+  intervalId: null,
+  activeTextIndex: 1,
+};
+
+// ── Version ──────────────────────────────────────────────────
+window.electronAPI.getVersion().then((v) => {
+  versionEl.textContent = `v${v}`;
+});
+
+// ── Timer logic ──────────────────────────────────────────────
+function formatTime(totalSeconds) {
+  const abs = Math.abs(totalSeconds);
+  const h = Math.floor(abs / 3600);
+  const m = Math.floor((abs % 3600) / 60);
+  const s = abs % 60;
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${pad(h)}:${pad(m)}:${pad(s)}`;
 }
 
-var timerRunning = true;
-var timerUp = false;
+function parseTime(str) {
+  const clean = str.replace(/^-/, '');
+  if (!/^\d{1,2}:\d{2}:\d{2}$/.test(clean)) return null;
+  const [h, m, s] = clean.split(':').map(Number);
+  if (m >= 60 || s >= 60) return null;
+  return h * 3600 + m * 60 + s;
+}
+
+function sendTimeUpdate(formatted) {
+  window.electronAPI.sendUpdate({ type: 'time', value: formatted, overtime: state.isOvertime });
+}
+
+function sendTextUpdate(text) {
+  window.electronAPI.sendUpdate({ type: 'text', value: text });
+}
+
+function tick() {
+  if (!state.isOvertime) {
+    state.totalSeconds--;
+    if (state.totalSeconds <= 0) {
+      state.totalSeconds = 0;
+      state.isOvertime = true;
+    }
+  } else {
+    state.totalSeconds++;
+  }
+
+  const formatted = formatTime(state.totalSeconds);
+  const display = state.isOvertime ? `-${formatted}` : formatted;
+  timeEl.textContent = display;
+  timeEl.classList.toggle('overtime', state.isOvertime);
+  sendTimeUpdate(display);
+}
 
 function startTimer() {
-   
-    
-    hours = parseInt(timer / 60 / 60, 10);
-    minutes = parseInt(timer / 60 % 60, 10);
-    seconds = parseInt(timer % 60, 10);
-
-    hours = hours < 10 ? "0" + hours : hours;
-    minutes = minutes < 10 ? "0" + minutes : minutes;
-    seconds = seconds < 10 ? "0" + seconds : seconds;
-
-    if(!timerUp) {
-        $('#time').text(hours + ":" + minutes + ":" + seconds);
-    } else {
-        $('#time').text("-" + hours + ":" + minutes + ":" + seconds);
-        $('#time').css('color', 'red');
-    }
-    
-
-    data.time = hours + ":" + minutes + ":" + seconds;
-
-    data.textSent = 0;
-    data.timeSent = 1;
-
-    ipcRenderer.send('request-update-label-in-second-window', data);
-        
-    if(!timerUp) {
-        if (--timer <= 0) {
-            timerUp = true;
-            //timer = duration;
-        }
-
-    } else {
-        timer++;
-    }
+  if (state.isRunning) return;
+  const parsed = parseTime(timeEl.textContent);
+  if (parsed === null) return;
+  state.totalSeconds = parsed;
+  state.isRunning = true;
+  startBtn.disabled = true;
+  timePresetBtns.forEach(b => b.disabled = true);
+  timeEditHint.classList.add('hidden');
+  state.intervalId = setInterval(tick, 1000);
 }
 
-$('#header-text').on('click', function() {
-    $('.h1-text').addClass('hidden');
-    $('.h1-input').removeClass('hidden');
-    $('.h1-input input').val($('.h1-text').text());
-    $('.h1-input input').focus();
+function pauseTimer() {
+  if (!state.isRunning) return;
+  clearInterval(state.intervalId);
+  state.intervalId = null;
+  state.isRunning = false;
+  startBtn.disabled = false;
+  timePresetBtns.forEach(b => b.disabled = false);
+  timeEditHint.classList.remove('hidden');
+}
+
+function resetTimer() {
+  pauseTimer();
+  state.isOvertime = false;
+  state.totalSeconds = 0;
+  timeEl.textContent = DEFAULT_TIME;
+  timeEl.classList.remove('overtime');
+  sendTimeUpdate(DEFAULT_TIME);
+}
+
+// ── Header text editing ──────────────────────────────────────
+document.getElementById('header-text').addEventListener('click', () => {
+  headerTextEl.classList.add('hidden');
+  headerInputWrapper.classList.remove('hidden');
+  headerInput.value = headerTextEl.textContent;
+  headerInput.focus();
 });
 
-$('.h1-input input').on('focusout', function() {
-    $('.h1-text').removeClass('hidden');
-    $('.h1-input').addClass('hidden');
-    if($(this).val() != "") {
-        $('.h1-text').text($(this).val());
-        data.text = $(this).val();
-    } else {
-        $('.h1-text').text("Zadej text...");
-        data.text = "Zadej text...";
-    }   
-
-    data.textSent = 1;
-    data.timeSent = 0;
-
-    ipcRenderer.send('request-update-label-in-second-window', data);
+headerInput.addEventListener('focusout', () => {
+  headerTextEl.classList.remove('hidden');
+  headerInputWrapper.classList.add('hidden');
+  const val = headerInput.value.trim() || t().placeholder;
+  headerTextEl.textContent = val;
+  state.activeTextIndex = null;
+  sendTextUpdate(val);
 });
 
-
-$('#countdown').on('click', function(){
-    $('#time').addClass('hidden');
-    $('#time-input').removeClass('hidden');
-    $('#time-input input').val($('#time').text());
-    $('#time-input input').focus();
+// ── Time editing ─────────────────────────────────────────────
+document.getElementById('countdown').addEventListener('click', () => {
+  if (state.isRunning) return;
+  timeEl.classList.add('hidden');
+  timeInputWrapper.classList.remove('hidden');
+  timeInput.value = timeEl.textContent;
+  timeInput.focus();
 });
 
-$('#time-input input').on('focusout', function() {
-    $('#time').removeClass('hidden');
-    $('#time-input').addClass('hidden');
-
-    if($(this).val() != "") {
-        $('#time').text($(this).val());
-        data.time = $(this).val();
-    } else {
-        $('#time').text("01:15:00");
-        data.time = "01:15:00";
-    }
-
-    data.textSent = 0;
-    data.timeSent = 1;
-
-
-    ipcRenderer.send('request-update-label-in-second-window', data);
+timeInput.addEventListener('focusout', () => {
+  const val = timeInput.value.trim();
+  if (parseTime(val) === null) {
+    // Invalid — shake, then revert to whatever was showing before
+    timeInput.classList.add('invalid');
+    timeInput.addEventListener('animationend', () => {
+      timeInput.classList.remove('invalid');
+    }, { once: true });
+    // Let focus leave naturally; revert to current display value
+    timeEl.classList.remove('hidden');
+    timeInputWrapper.classList.add('hidden');
+    return;
+  }
+  timeEl.classList.remove('hidden');
+  timeInputWrapper.classList.add('hidden');
+  timeEl.textContent = val;
+  sendTimeUpdate(val);
 });
 
+// ── Reset: hold-to-confirm (1.5 s) ───────────────────────────
+let resetHoldTimer = null;
 
-
-$('#start-btn').on('click', function() {
-    
-    if(timerRunning) {
-        
-        timerRunning = false;
-        $(this).addClass('disabled');
-
-        time = $('#time').text();
-        
-        hours = parseInt(time.split(":")[0]);
-        minutes = parseInt(time.split(":")[1]);
-        seconds = parseInt(time.split(":")[2]);
-
-        duration = (hours * 60 * 60) + (minutes * 60) + seconds;
-
-        timer = duration, hours, minutes, seconds;
-
-        intervalId = setInterval(startTimer, 1000);
-    }
-
+resetBtn.addEventListener('mousedown', () => {
+  resetBtn.classList.add('holding');
+  resetHoldTimer = setTimeout(() => {
+    resetBtn.classList.remove('holding');
+    resetTimer();
+  }, 1500);
 });
 
-$('#stop-btn').on('click', function() {
-    if (intervalId) {
-        timerRunning = true;
-        $('#start-btn').removeClass('disabled');
-        clearInterval(intervalId);
-    }
+function cancelReset() {
+  clearTimeout(resetHoldTimer);
+  resetBtn.classList.remove('holding');
+}
+
+resetBtn.addEventListener('mouseup', cancelReset);
+resetBtn.addEventListener('mouseleave', cancelReset);
+
+// ── Control buttons ──────────────────────────────────────────
+startBtn.addEventListener('click', startTimer);
+stopBtn.addEventListener('click', pauseTimer);
+
+// ── Time presets ─────────────────────────────────────────────
+timePresetBtns.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    if (state.isRunning) return;
+    const t = btn.dataset.time;
+    timeEl.textContent = t;
+    sendTimeUpdate(t);
+  });
 });
 
-$('#reset-btn').on('click', function() {
-    if (intervalId) {
-        timerRunning = true;
-        timerUp = false;
-        $('#start-btn').removeClass('disabled');
-        $('#time').css('color', 'black');
-        clearInterval(intervalId);
-    }
-    
-    $('#time').text('01:15:00');
-
-    data.time = '01:15:00';
-
-    data.textSent = 0;
-    data.timeSent = 1;
-
-    ipcRenderer.send('request-update-label-in-second-window', data);
+// ── Quick-set text buttons ───────────────────────────────────
+definedTextItems.forEach((item, i) => {
+  item.addEventListener('click', () => {
+    const text = item.textContent;
+    headerTextEl.textContent = text;
+    state.activeTextIndex = i;
+    sendTextUpdate(text);
+  });
 });
 
-$('.defined-texts-item').on('click', function() {
-    $('.h1-text').text($(this).html());
-    data.text = $(this).html();
-    data.textSent = 1;
-    data.timeSent = 0;
+// ── Language switcher ────────────────────────────────────────
+function applyLanguage(lang) {
+  const strings = i18n[lang];
+  currentLang = lang;
 
-    ipcRenderer.send('request-update-label-in-second-window', data);
-});
+  definedTextItems.forEach((item, i) => {
+    item.textContent = strings.texts[i];
+  });
+
+  setTextLabel.textContent = strings.setTextLabel;
+  quickSetLabel.textContent = strings.quickSet;
+  stopBtn.textContent = strings.pause;
+
+  if (state.activeTextIndex !== null) {
+    const newText = strings.texts[state.activeTextIndex];
+    headerTextEl.textContent = newText;
+    sendTextUpdate(newText);
+  }
+
+  langCsBtn.classList.toggle('active', lang === 'cs');
+  langEnBtn.classList.toggle('active', lang === 'en');
+}
+
+langCsBtn.addEventListener('click', () => applyLanguage('cs'));
+langEnBtn.addEventListener('click', () => applyLanguage('en'));

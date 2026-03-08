@@ -1,10 +1,9 @@
 {
   "name": "cuckoos_nest",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "Admin for exit game Cuckoo's nest from BrainFAQ",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make"
@@ -12,22 +11,19 @@
   "author": "Miroslav Švarc",
   "license": "MIT",
   "devDependencies": {
-    "@electron-forge/cli": "^6.0.0-beta.57",
-    "@electron-forge/maker-deb": "^6.0.0-beta.57",
-    "@electron-forge/maker-rpm": "^6.0.0-beta.57",
-    "@electron-forge/maker-squirrel": "^6.0.0-beta.57",
-    "@electron-forge/maker-zip": "^6.0.0-beta.57",
-    "electron": "^13.1.5"
-  },
-  "dependencies": {
-    "bootstrap": "^5.0.2",
-    "electron-squirrel-startup": "^1.0.0",
-    "jquery": "^3.6.0"
+    "@electron-forge/cli": "^7.7.0",
+    "@electron-forge/maker-deb": "^7.7.0",
+    "@electron-forge/maker-dmg": "^7.11.1",
+    "@electron-forge/maker-rpm": "^7.7.0",
+    "@electron-forge/maker-squirrel": "^7.7.0",
+    "@electron-forge/maker-zip": "^7.7.0",
+    "electron": "^34.0.0"
   },
   "config": {
     "forge": {
       "packagerConfig": {
-        "icon": "img/kuku.ico"
+        "icon": "img/kuku",
+        "productName": "Cuckoo's Nest Admin"
       },
       "makers": [
         {
@@ -35,14 +31,15 @@
           "config": {
             "name": "kuku",
             "setupIcon": "img/kuku.ico",
-            "setupExe": "cuckoos_nest-v1.1-setup.exe"
+            "setupExe": "CuckoosNestAdmin-v2.0-setup.exe"
           }
         },
         {
-          "name": "@electron-forge/maker-zip",
-          "platforms": [
-            "darwin"
-          ]
+          "name": "@electron-forge/maker-dmg",
+          "config": {
+            "icon": "img/kuku.icns",
+            "format": "ULFO"
+          }
         },
         {
           "name": "@electron-forge/maker-deb",

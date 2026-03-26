@@ -34,6 +34,7 @@ function createWindows() {
       webPreferences: {
         contextIsolation: true,
         nodeIntegration: false,
+        backgroundThrottling: false,
         preload: path.join(__dirname, 'preload-display.js'),
       },
     });
@@ -49,6 +50,7 @@ function createWindows() {
       webPreferences: {
         contextIsolation: true,
         nodeIntegration: false,
+        backgroundThrottling: false,
         preload: path.join(__dirname, 'preload-display.js'),
       },
     });
@@ -65,6 +67,7 @@ function createWindows() {
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
+      backgroundThrottling: false,
       preload: path.join(__dirname, 'preload-admin.js'),
     },
   });

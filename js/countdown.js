@@ -59,6 +59,8 @@ const state = {
   isOvertime: false,
   intervalId: null,
   activeTextIndex: 1,
+  startTime: null,      // wall-clock ms when current run segment started
+  startSeconds: null,   // signed seconds at segment start (negative = overtime)
 };
 
 // ── Version ──────────────────────────────────────────────────
@@ -93,15 +95,11 @@ function sendTextUpdate(text) {
 }
 
 function tick() {
-  if (!state.isOvertime) {
-    state.totalSeconds--;
-    if (state.totalSeconds <= 0) {
-      state.totalSeconds = 0;
-      state.isOvertime = true;
-    }
-  } else {
-    state.totalSeconds++;
-  }
+  const elapsed = Math.floor((Date.now() - state.startTime) / 1000);
+  const signedRemaining = state.startSeconds - elapsed;
+
+  state.isOvertime = signedRemaining < 0;
+  state.totalSeconds = Math.abs(signedRemaining);
 
   const formatted = formatTime(state.totalSeconds);
   const display = state.isOvertime ? `-${formatted}` : formatted;
@@ -115,6 +113,9 @@ function startTimer() {
   const parsed = parseTime(timeEl.textContent);
   if (parsed === null) return;
   state.totalSeconds = parsed;
+  // startSeconds is negative when resuming from overtime
+  state.startSeconds = state.isOvertime ? -parsed : parsed;
+  state.startTime = Date.now();
   state.isRunning = true;
   startBtn.disabled = true;
   timePresetBtns.forEach(b => b.disabled = true);

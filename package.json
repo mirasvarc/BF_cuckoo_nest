@@ -1,6 +1,6 @@
 {
   "name": "cuckoos_nest",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Admin for exit game Cuckoo's nest from BrainFAQ",
   "main": "main.js",
   "scripts": {
@@ -31,7 +31,7 @@
           "config": {
             "name": "kuku",
             "setupIcon": "img/kuku.ico",
-            "setupExe": "CuckoosNestAdmin-v2.0-setup.exe"
+            "setupExe": "CuckoosNestAdmin-v2.1-setup.exe"
           }
         },
         {

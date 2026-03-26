@@ -1,5 +1,10 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  onUpdate: (callback) => ipcRenderer.on('update-display', (_event, data) => callback(data)),
+  notifyReady: () => ipcRenderer.send('display-ready'),
+  onUpdate: (callback) => {
+    // Remove any previous listener to prevent stacking if called more than once
+    ipcRenderer.removeAllListeners('update-display');
+    ipcRenderer.on('update-display', (_event, data) => callback(data));
+  },
 });

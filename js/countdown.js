@@ -242,3 +242,10 @@ langEnBtn.addEventListener('click', () => applyLanguage('en'));
 
 // Apply default language on startup
 applyLanguage(currentLang);
+
+// ── State sync ───────────────────────────────────────────────
+// Main process asks us to resend current state when display (re)loads
+window.electronAPI.onSyncRequest(() => {
+  sendTimeUpdate(timeEl.textContent);
+  sendTextUpdate(headerTextEl.textContent);
+});

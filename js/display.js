@@ -7,7 +7,13 @@ function renderTime(el, value) {
   const spans = el.querySelectorAll('.digit');
 
   if (spans.length !== chars.length) {
-    el.innerHTML = chars.map(c => `<span class="digit">${c}</span>`).join('');
+    el.textContent = '';
+    chars.forEach(c => {
+      const span = document.createElement('span');
+      span.className = 'digit';
+      span.textContent = c;
+      el.appendChild(span);
+    });
     return;
   }
 
@@ -24,8 +30,9 @@ function renderTime(el, value) {
   });
 }
 
-// Initialise spans on load
+// Initialise spans on load, then tell main we are ready to receive state
 renderTime(timeEl, timeEl.textContent);
+window.electronAPI.notifyReady();
 
 // ── IPC updates ──────────────────────────────────────────────
 window.electronAPI.onUpdate((data) => {
